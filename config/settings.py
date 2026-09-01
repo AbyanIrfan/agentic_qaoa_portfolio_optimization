@@ -10,9 +10,9 @@ load_dotenv()
 
 # ── LLM backends ──────────────────────────────────────────────────────────────
 LLM_BACKENDS = {
-    "claude":  "claude-sonnet-4-5",
-    "gpt":     "gpt-4o",
-    "gemini":  "gemini-2.0-flash",
+    "claude":  "claude-sonnet-4-6",   # matches what's proven working from night one
+    "gpt":     "gpt-5.6-sol",         # current OpenAI flagship (gpt-4o is stale)
+    "gemini":  "gemini-3.1-pro-preview",  # current Gemini flagship (2.0-flash is shut down)
 }
 
 # Heterogeneous routing: maps each pipeline node to its assigned LLM

@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-from langchain_anthropic import ChatAnthropic
+from llm.router import get_node_llm, get_response_text
 
 RESULTS_DIR = Path("results")
 
@@ -66,7 +66,8 @@ def _write_report(state, metrics, interpretation) -> Path:
     not overwritten, so past runs stay comparable."""
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    report_path = RESULTS_DIR / f"analysis_{timestamp}.txt"
+    backend = state.get("llm_name", "unknown")
+    report_path = RESULTS_DIR / f"analysis_{backend}_{timestamp}.txt"
 
     lines = [
         f"Analysis Report — {timestamp}",
@@ -89,7 +90,7 @@ def _write_report(state, metrics, interpretation) -> Path:
 
 
 def analysis_node(state):
-    llm = ChatAnthropic(model="claude-sonnet-4-6", temperature=0)
+    llm = get_node_llm("analysis", state.get("llm_name"))                # analysis.py
 
     print("[Analysis] Computing metrics...")
 
@@ -124,7 +125,7 @@ def analysis_node(state):
 
     Be concise and technical.
     """
-    interpretation = llm.invoke(prompt).content
+    interpretation = get_response_text(llm.invoke(prompt))
 
     print(f"[Analysis] AR={approx_ratio:.4f} | CVaR={cvar_value:.4f} | Energy={energy:.4f}")
     print(f"[Analysis] Interpretation:\n{interpretation}")

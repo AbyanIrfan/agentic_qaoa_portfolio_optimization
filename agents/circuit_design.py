@@ -9,7 +9,7 @@ from __future__ import annotations
 import traceback
 
 import numpy as np
-from langchain_anthropic import ChatAnthropic
+from llm.router import get_node_llm, get_response_text
 from qiskit import QuantumCircuit
 from qiskit.circuit import ParameterVector
 from qiskit.circuit.library import XXPlusYYGate
@@ -21,7 +21,7 @@ from rag.store_utils import get_arxiv_runtime_cached, get_qiskit_doc_store
 
 
 def circuit_design_node(state):
-    llm = ChatAnthropic(model="claude-sonnet-4-6", temperature=0)
+    llm = get_node_llm("circuit_design", state.get("llm_name"))          # circuit_design.py
 
     qiskit_doc_store = get_qiskit_doc_store()
     arxiv_store, embed_client, embedding_model = get_arxiv_runtime_cached()
@@ -63,7 +63,7 @@ def circuit_design_node(state):
     REASONING: <2-3 sentences citing specific papers from the literature>
     """
 
-    raw_variant = llm.invoke(variant_prompt).content.strip()
+    raw_variant = get_response_text(llm.invoke(variant_prompt)).strip()
     variant     = "warm_start_xy"
     reasoning   = ""
 
@@ -162,7 +162,7 @@ No import statements. No print statements. No markdown. No explanation.
 Assign result to exactly: circuit
 """
 
-        raw = llm.invoke(code_prompt).content.strip()
+        raw = get_response_text(llm.invoke(code_prompt)).strip()
 
         if "```" in raw:
             blocks = raw.split("```")

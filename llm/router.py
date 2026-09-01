@@ -34,7 +34,7 @@ def get_llm(name: str):
     elif name == "gpt":
         return ChatOpenAI(model=model_id, temperature=0)
     elif name == "gemini":
-        return ChatGoogleGenerativeAI(model=model_id, temperature=0)
+        return ChatGoogleGenerativeAI(model=model_id, temperature=0, timeout=90, thinking_level="Medium")
 
 
 def get_node_llm(node_name: str, llm_override: str = None):
@@ -49,3 +49,28 @@ def get_node_llm(node_name: str, llm_override: str = None):
 
     assigned = NODE_LLM_MAP.get(node_name, "claude")
     return get_llm(assigned)
+
+
+def get_response_text(response) -> str:
+    """
+    Normalize a LangChain chat response's .content into a plain string,
+    regardless of provider quirks. ChatAnthropic/ChatOpenAI return a plain
+    string in normal (non-thinking) mode; ChatGoogleGenerativeAI's newer
+    reasoning models (e.g. gemini-3.1-pro-preview) return a list of content
+    blocks instead (text blocks plus an internal reasoning signature block),
+    even with default settings. Every node should call this instead of
+    touching response.content directly, so a provider switch never crashes
+    on response-shape differences.
+    """
+    content = response.content
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if isinstance(block, dict) and block.get("type") == "text":
+                parts.append(block.get("text", ""))
+            elif isinstance(block, str):
+                parts.append(block)
+        return "".join(parts)
+    return str(content)

@@ -71,7 +71,6 @@ def problem_init_node(state: dict) -> dict:
 
     return {
         "problem_input":  problem_input,
-        "llm_name":       "claude",
         "retry_count":    0,
         "n_assets":       n_assets,
         "tickers_used":   tickers_used,

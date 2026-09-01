@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 
-from langchain_anthropic import ChatAnthropic
+from llm.router import get_node_llm, get_response_text
 
 from rag.corpus_query import _embed_query
 from rag.store_utils import get_arxiv_runtime_cached
@@ -24,7 +24,7 @@ def literature_validation_node(state):
             "validated_recommendation": state.get("literature_recommendation"),
         }
 
-    llm = ChatAnthropic(model="claude-sonnet-4-6", temperature=0)
+    llm = get_node_llm("literature_validation", state.get("llm_name"))   # literature_validation.py
 
     print("=" * 60)
     print("[Literature Validation] Cross-checking against arXiv full text...\n")
@@ -97,7 +97,7 @@ def literature_validation_node(state):
     """
 
     print("\n[Literature Validation] Cross-checking with LLM...")
-    raw = llm.invoke(validation_prompt).content.strip()
+    raw = get_response_text(llm.invoke(validation_prompt)).strip()
 
     sections = {"SUPPORTED": "", "CONTRADICTED": "", "UNVERIFIED": "", "REVISED_RECOMMENDATION": ""}
     current_key = None
@@ -164,7 +164,7 @@ def literature_validation_node(state):
         """
 
         print("\n[Literature Validation] Re-checking numeric parameters against the cross-check...")
-        raw_params = llm.invoke(param_prompt).content.strip()
+        raw_params = get_response_text(llm.invoke(param_prompt)).strip()
         if raw_params.startswith("```"):
             raw_params = raw_params.split("```")[1]
             if raw_params.startswith("json"):

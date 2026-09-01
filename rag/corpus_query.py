@@ -9,6 +9,7 @@
 # _embed_client = _OpenAIClient()
 
 import numpy as np
+from llm.router import get_response_text
 
 
 def _embed_query(text: str, client, model: str = "text-embedding-3-small") -> np.ndarray:
@@ -115,7 +116,7 @@ def query_corpus_for_implementation_detail(
     focus entirely on the construction itself.
     """
 
-    answer = llm.invoke(prompt).content
+    answer = get_response_text(llm.invoke(prompt))
 
     return {
         "found": True,

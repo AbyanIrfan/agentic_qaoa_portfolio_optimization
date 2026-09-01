@@ -29,7 +29,7 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-from langchain_anthropic import ChatAnthropic
+from llm.router import get_node_llm, get_response_text
 
 RESULTS_DIR = Path("results")
 
@@ -71,18 +71,18 @@ def _describe_warm_start_from_circuit(circuit) -> str:
     )
 
 
-def _write_report(report_text: str) -> Path:
+def _write_report(report_text: str, backend: str = "unknown") -> Path:
     """Write a timestamped final report to results/. One file per run,
     not overwritten, matching Node 4's analysis-report convention."""
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    report_path = RESULTS_DIR / f"report_{timestamp}.txt"
+    report_path = RESULTS_DIR / f"report_{backend}_{timestamp}.txt"
     report_path.write_text(report_text, encoding="utf-8")
     return report_path
 
 
 def report_node(state):
-    llm = ChatAnthropic(model="claude-sonnet-4-6", temperature=0)
+    llm = get_node_llm("report", state.get("llm_name"))                  # report.py
 
     print("[Report] Generating final report...")
 
@@ -165,14 +165,14 @@ def report_node(state):
     Write in a technical but clear style suitable for a research paper appendix.
     """
 
-    report = llm.invoke(prompt).content
+    report = get_response_text(llm.invoke(prompt))
 
     print("[Report] Done.\n")
     print("=" * 60)
     print(report)
     print("=" * 60)
 
-    report_path = _write_report(report)
+    report_path = _write_report(report, backend=state.get("llm_name", "unknown"))
     print(f"[Report] Report written to {report_path}")
 
     print("\n✓ Full pipeline complete — all 5 nodes executed successfully.")

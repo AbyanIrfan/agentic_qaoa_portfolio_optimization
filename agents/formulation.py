@@ -10,14 +10,14 @@ import traceback
 
 import cvxpy as cp
 import numpy as np
-from langchain_anthropic import ChatAnthropic
+from llm.router import get_node_llm, get_response_text
 from qiskit.quantum_info import SparsePauliOp
 from qiskit_finance.applications.optimization import PortfolioOptimization
 from qiskit_optimization.converters import LinearEqualityToPenalty
 
 
 def formulation_node(state):
-    llm = ChatAnthropic(model="claude-sonnet-4-6", temperature=0)
+    llm = get_node_llm("formulation", state.get("llm_name"))             # formulation.py
 
     MAX_RETRIES    = 3
     last_error     = None
@@ -85,7 +85,7 @@ No import statements. No print statements. No markdown. No explanation.
 Assign results to exactly: hamiltonian, offset, warm_start_vec, truncated_pairs
 """
 
-        raw = llm.invoke(code_prompt).content.strip()
+        raw = get_response_text(llm.invoke(code_prompt)).strip()
 
         if "```" in raw:
             blocks = raw.split("```")

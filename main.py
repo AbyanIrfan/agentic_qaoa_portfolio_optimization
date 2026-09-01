@@ -59,4 +59,4 @@ def run_single(llm_name: str = "hetero"):
 
 
 if __name__ == "__main__":
-    run_single(llm_name="hetero")
+    run_single(llm_name="gemini")  # or "claude", "gemini", "hetero"

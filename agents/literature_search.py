@@ -11,7 +11,7 @@ import time
 
 import requests
 from dotenv import load_dotenv
-from langchain_anthropic import ChatAnthropic
+from llm.router import get_node_llm, get_response_text
 
 load_dotenv()
 S2_API_KEY = os.environ.get("SEMANTIC_SCHOLAR_API_KEY")
@@ -59,8 +59,7 @@ def s2_search_papers(query, limit=5, sleep_time=1.2, max_retries=4):
 
 
 def literature_search_node(state):
-    llm = ChatAnthropic(model="claude-sonnet-4-6", temperature=0)
-
+    llm = get_node_llm("literature_search", state.get("llm_name"))       # literature_search.py
     print("=" * 60)
     print("[Literature Search] Starting...\n")
 
@@ -92,7 +91,7 @@ def literature_search_node(state):
     """
 
     print("[Literature Search] Generating search queries...")
-    raw = llm.invoke(query_prompt).content.strip()
+    raw = get_response_text(llm.invoke(query_prompt)).strip()
 
     if raw.startswith("```"):
         raw = raw.split("```")[1]
@@ -177,7 +176,7 @@ def literature_search_node(state):
     """
 
     print("\n[Literature Search] Synthesizing recommendations...")
-    recommendation = llm.invoke(synthesis_prompt).content
+    recommendation = get_response_text(llm.invoke(synthesis_prompt))
 
     print("\n" + "=" * 60)
     print("LITERATURE RECOMMENDATION:")
@@ -214,7 +213,7 @@ def literature_search_node(state):
     Base each value on specific evidence from the literature.
     """
 
-    raw_params = llm.invoke(param_prompt).content.strip()
+    raw_params = get_response_text(llm.invoke(param_prompt)).strip()
 
     if raw_params.startswith("```"):
         raw_params = raw_params.split("```")[1]
