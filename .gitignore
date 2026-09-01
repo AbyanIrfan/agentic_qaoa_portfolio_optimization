@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+*.egg
+
+# Virtual environment
+.venv/
+
+# Environment secrets — NEVER commit this
+.env
+
+# Data — regenerable via scripts/setup_databases.ps1 or .sh
+data/papers/arxiv/*.pdf
+data/references/arxiv_db/*.faiss
+data/references/arxiv_db/*.meta.json
+data/references/arxiv_db/*.manifest.json
+data/references/qiskit_raw.json
+data/references/qiskit_formatted.json
+
+# yfinance cache
+.cache/
+
+# Results (large files — keep structure, ignore data)
+results/*.json
+results/*.csv
+results/*.pkl
+results/*.txt
+!results/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# LangGraph checkpoints
+checkpoints/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store

@@ -1,0 +1,48 @@
+# ── LangGraph / LangChain orchestration ──────────────────────────────────────
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+
+# ── LLM provider backends ─────────────────────────────────────────────────────
+langchain-anthropic>=0.3.0          # Claude
+langchain-openai>=0.2.0             # GPT
+langchain-google-genai>=2.0.0       # Gemini
+openai                               # direct client (embeddings / tiktoken use)
+tiktoken
+
+# ── Quantum computing ─────────────────────────────────────────────────────────
+qiskit>=1.2.0
+qiskit-ibm-runtime>=0.28.0
+qiskit-aer>=0.15.0                  # Local simulator
+qiskit-optimization>=0.6.0          # QUBO tools
+qiskit-algorithms                   # new: added in Colab phase
+qiskit-finance                      # new: added in Colab phase
+
+# ── Optimization / warm-start ─────────────────────────────────────────────────
+cvxpy>=1.4.0                        # QP relaxation solver
+scipy>=1.13.0
+networkx>=3.3.0                     # Graph construction
+rustworkx>=0.15.0                   # Qiskit's graph backend
+
+# ── Literature / RAG pipeline ─────────────────────────────────────────────────
+faiss-cpu                           # embed_store.py vector index
+pypdf                               # pdf_extractor.py
+docstring_parser                    # doc_lookup.py / call_validator.py
+
+# ── Live finance data ──────────────────────────────────────────────────────────
+yfinance                            # problem_init_node_live_yfinance.py
+
+# ── Data / results ────────────────────────────────────────────────────────────
+numpy>=1.26.0
+pandas>=2.2.0
+matplotlib>=3.9.0
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0                # .env key loading
+pydantic>=2.7.0                     # State validation
+tqdm>=4.66.0                        # Progress bars for benchmark sweeps
+rich>=13.7.0                        # Pretty console output
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest>=8.2.0
+pytest-asyncio>=0.23.0
