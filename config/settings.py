@@ -15,13 +15,14 @@ LLM_BACKENDS = {
     "gemini":  "gemini-3.1-pro-preview",  # current Gemini flagship (2.0-flash is shut down)
 }
 
-# Heterogeneous routing: maps each pipeline node to its assigned LLM
 NODE_LLM_MAP = {
-    "formulation":    "claude",    # Deep math reasoning
-    "circuit_design": "gpt",       # Strong code generation
-    "execution":      "gemini",    # Fast dispatch, minimal reasoning
-    "analysis":       "claude",    # Scientific interpretation
-    "report":         "claude",    # Technical prose
+    "literature_search":     "gpt",     # tentative — see comparison report Section 8.1
+    "literature_validation": "claude",
+    "formulation":           "gpt",     # tentative — see comparison report Section 8.1
+    "circuit_design":        "gemini",  # tentative — retest after thinking_level fix
+    "analysis":              "claude",
+    "report":                "claude",
+    # "execution" removed — agents/execution.py makes no LLM call
 }
 
 # ── QAOA hyperparameters ──────────────────────────────────────────────────────

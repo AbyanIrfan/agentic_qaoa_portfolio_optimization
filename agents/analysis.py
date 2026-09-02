@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
+from itertools import combinations as icombs
 
 from llm.router import get_node_llm, get_response_text
 
@@ -36,10 +37,28 @@ def compute_energy(quasi_dist, hamiltonian, offset=0.0):
     )
 
 
-def compute_approx_ratio(quasi_dist, hamiltonian, offset=0.0):
-    n          = hamiltonian.num_qubits
-    energies   = [bitstring_energy_ising(f"{i:0{n}b}", hamiltonian, offset) for i in range(2**n)]
-    optimal    = min(energies)
+def compute_feasible_optimal(hamiltonian, offset, n_assets, budget):
+    """
+    True classical optimum restricted to the budget-feasible subspace
+    (Hamming weight == budget). Brute-forcing over all 2^n bitstrings
+    instead would only give the right answer by coincidence — it relies
+    on the Hamiltonian's penalty term being strong enough that no
+    infeasible bitstring ever scores lower than the true feasible
+    optimum, which isn't verified anywhere and isn't guaranteed to hold
+    for every instance size/scale.
+    """
+    best = None
+    for combo in icombs(range(n_assets), budget):
+        state_int = sum(1 << i for i in combo)
+        bitstring = f"{state_int:0{n_assets}b}"
+        energy = bitstring_energy_ising(bitstring, hamiltonian, offset)
+        if best is None or energy < best:
+            best = energy
+    return best
+
+
+def compute_approx_ratio(quasi_dist, hamiltonian, offset, n_assets, budget):
+    optimal    = compute_feasible_optimal(hamiltonian, offset, n_assets, budget)
     best_found = min(bitstring_energy_ising(bs, hamiltonian, offset) for bs in quasi_dist)
     return 1.0 if optimal == 0 else float(best_found / optimal)
 
@@ -98,7 +117,7 @@ def analysis_node(state):
     hamiltonian  = state["hamiltonian"]
     offset = state["offset"]
 
-    approx_ratio = compute_approx_ratio(job_results, hamiltonian, offset)
+    approx_ratio =     approx_ratio = compute_approx_ratio(job_results, hamiltonian, offset, state["n_assets"], state["budget"])
     cvar_value   = compute_cvar(job_results, hamiltonian, alpha=0.25, offset=offset)
     energy       = compute_energy(job_results, hamiltonian, offset)
 

@@ -34,7 +34,7 @@ def get_llm(name: str):
     elif name == "gpt":
         return ChatOpenAI(model=model_id, temperature=0)
     elif name == "gemini":
-        return ChatGoogleGenerativeAI(model=model_id, temperature=0, timeout=90, thinking_level="Medium")
+        return ChatGoogleGenerativeAI(model=model_id, temperature=0, thinking_level="medium")
 
 
 def get_node_llm(node_name: str, llm_override: str = None):
