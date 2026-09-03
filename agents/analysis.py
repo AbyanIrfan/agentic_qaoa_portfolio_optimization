@@ -117,9 +117,26 @@ def analysis_node(state):
     hamiltonian  = state["hamiltonian"]
     offset = state["offset"]
 
-    approx_ratio =     approx_ratio = compute_approx_ratio(job_results, hamiltonian, offset, state["n_assets"], state["budget"])
-    cvar_value   = compute_cvar(job_results, hamiltonian, alpha=0.25, offset=offset)
-    energy       = compute_energy(job_results, hamiltonian, offset)
+    approx_ratio = compute_approx_ratio(job_results, hamiltonian, offset, state["n_assets"], state["budget"])
+
+    # CVaR is an optimization-time training signal, computed fresh every
+    # COBYLA iteration in execution.py — not something to independently
+    # re-derive from a stored bitstring snapshot after the fact. Report the
+    # value the optimizer itself actually used and converged to, rather
+    # than recomputing a second, potentially-divergent CVaR here.
+    cvar_value = state["final_cvar_opt"]
+
+    # Kept as a cheap sanity check, not the reported value: now that
+    # job_results is guaranteed fresh (see execution.py), this SHOULD match
+    # cvar_value almost exactly. If it ever doesn't, that's a real signal
+    # the two CVaR implementations disagree on something beyond staleness.
+    _cvar_cross_check = compute_cvar(job_results, hamiltonian, alpha=0.25, offset=offset)
+    if abs(_cvar_cross_check - cvar_value) > 1e-6:
+        print(f"  [Warning] CVaR cross-check mismatch: optimizer reported "
+              f"{cvar_value:.6f}, recomputed from final distribution "
+              f"{_cvar_cross_check:.6f} — investigate before trusting this run's CVaR.")
+
+    energy = compute_energy(job_results, hamiltonian, offset)
 
     metrics = {
         "approx_ratio": approx_ratio,

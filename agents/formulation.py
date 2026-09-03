@@ -147,6 +147,21 @@ Assign results to exactly: hamiltonian, offset, warm_start_vec, truncated_pairs
             assert abs(ws_sum - state["budget"]) < 0.1, \
                 f"warm_start_vec sums to {ws_sum:.4f}, expected ≈ {state['budget']}"
 
+            # Reject a near-uniform vector (e.g. every entry == budget/n_assets)
+            # as a proxy for "the generated code never actually solved the QP
+            # relaxation against mu/sigma" — a real per-asset optimization
+            # against distinct return/risk inputs essentially never lands on
+            # exact uniformity. Skipped when budget == n_assets, where the only
+            # feasible relaxation solution IS the uniform all-selected vector.
+            if state["n_assets"] != state["budget"]:
+                ws_std = float(np.std(warm_start_vec))
+                assert ws_std > 1e-3, \
+                    (f"warm_start_vec looks degenerate/uniform (std={ws_std:.6f}, "
+                     f"values={np.round(warm_start_vec, 4)}) — this usually means "
+                     f"the generated code didn't actually solve the QP relaxation "
+                     f"against mu/sigma, just filled in a placeholder satisfying "
+                     f"the sum constraint.")
+
             assert truncated_pairs is not None, \
                 "truncated_pairs not produced"
             assert isinstance(truncated_pairs, list), \

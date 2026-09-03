@@ -217,6 +217,15 @@ def execution_node(state):
         options = {"maxiter": MAX_ITER, "rhobeg": 0.5},
     )
 
+    # COBYLA's last internal evaluate() call doesn't necessarily land at the
+    # params it ultimately reports as optimal (opt_result.x), so
+    # obj.final_distribution right after minimize() can reflect a different,
+    # sometimes worse, point. One extra evaluation at the confirmed-final
+    # params fixes this cheaply — it reuses the exact same sampling/tracking
+    # logic (updates final_distribution, best_bitstring/best_value, and the
+    # history lists), it just guarantees the LAST entry is genuinely final.
+    obj.evaluate(opt_result.x)
+
     job_results = {
         format(s_int, f'0{n_qubits}b'): prob
         for s_int, (prob, _) in obj.final_distribution.items()

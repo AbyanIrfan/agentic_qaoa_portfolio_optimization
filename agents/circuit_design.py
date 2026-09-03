@@ -179,7 +179,10 @@ Assign result to exactly: circuit
         # ── Static validation against the Qiskit doc store, BEFORE exec ────
         if qiskit_doc_store is not None:
             print(f"  Checking generated code against Qiskit doc store...")
-            static_problems = validate_generated_code(generated_code, qiskit_doc_store)
+            static_problems = validate_generated_code(
+                generated_code, qiskit_doc_store,
+                known_var_types={"hamiltonian": type(state["hamiltonian"])},
+            )
             if static_problems:
                 last_error = (
                     "Static validation against the Qiskit API reference found "
