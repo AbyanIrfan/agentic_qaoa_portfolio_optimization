@@ -89,6 +89,7 @@ def report_node(state):
     ar    = f"{state['approx_ratio']:.4f}" if state.get('approx_ratio') is not None else "N/A"
     cvar  = f"{state['cvar_value']:.4f}"   if state.get('cvar_value')   is not None else "N/A"
     enrgy = f"{state['energy']:.4f}"       if state.get('energy')       is not None else "N/A"
+    sharpe = f"{state['sharpe_ratio']:.4f}" if state.get('sharpe_ratio') is not None else "N/A"
 
     circuit = state.get("circuit")
     warm_start_fact = (
@@ -116,7 +117,7 @@ def report_node(state):
     2. Approach & Circuit Design Choices (justify variant and p-layers)
     3. Warm-Start Analysis (QP relaxation vector, XY-mixer truncation)
     4. Execution Details (backend, shots)
-    5. Results (approximation ratio, CVaR, energy)
+    5. Results (approximation ratio, CVaR, energy, Sharpe ratio)
     6. Reasoning & Conclusion
 
     CRITICAL GROUNDING INSTRUCTION: Base every claim about the warm-start
@@ -157,6 +158,7 @@ def report_node(state):
     - Approximation ratio: {ar}
     - CVaR:                {cvar}
     - Energy:              {enrgy}
+    - Sharpe ratio (equal-weighted, annualized): {sharpe}
     - Static doc-store validation: {state.get('static_validation_passed', 'N/A')}
     - Hamming-weight preservation: {state.get('hw_preservation_fraction', 'N/A')}
     - Analysis node passes:  {state.get('retry_count', 0)}

@@ -17,9 +17,9 @@ LLM_BACKENDS = {
 
 NODE_LLM_MAP = {
     "literature_search":     "gpt",     # tentative — see comparison report Section 8.1
-    "literature_validation": "claude",
-    "formulation":           "gpt",     # tentative — see comparison report Section 8.1
-    "circuit_design":        "gemini",  # tentative — retest after thinking_level fix
+    "literature_validation": "claude",  # reverted to baseline
+    "formulation":           "gpt",     # held fixed, per the test design
+    "circuit_design":        "gpt",     # changed from "gemini" — the real variable, it turns out
     "analysis":              "claude",
     "report":                "claude",
     # "execution" removed — agents/execution.py makes no LLM call
@@ -47,8 +47,9 @@ USE_HARDWARE       = False         # Flip to True for real device runs
 # ═══════════════════════════════════════════════════════════════════════════
 # Problem instance settings — edit these for your specific run
 # ═══════════════════════════════════════════════════════════════════════════
-USE_LIVE_DATA      = True                                  # False reproduces the exact Woerner benchmark
-TICKERS            = ["AAPL", "XOM", "JPM", "JNJ", "GLD"]  # only used if USE_LIVE_DATA=True
+USE_LIVE_DATA      = False                                 # False reproduces the exact Woerner benchmark
+TICKERS     = ["LIN.DE", "BAYN.DE", "VNA.DE", "MTX.DE", "MUV2.DE",
+               "SAP.DE", "SIE.DE", "ALV.DE", "DTE.DE", "BAS.DE"]  # only used if USE_LIVE_DATA=True
 BUDGET              = 3                                     # number of assets to select
 RISK_FACTOR         = 0.5                                    # risk-aversion weight, conventionally in [0, 1]
 LOOKBACK_DAYS       = 252                                     # ~1 trading year; see finance_data.py docstring
@@ -56,6 +57,9 @@ RETURN_CONVENTION   = "log"                                    # "log" or "simpl
 END_DATE            = "2026-09-02"                               # pinned for the multi-run stability study — see
                                                                   # comparison report Section 6.2/10; None = most recent                                     # e.g. "2026-02-16" to reproduce a historical window
 PENALTY             = 12                                  # QUBO constraint-penalty starting weight (Node 0 may revise)
+RISK_FREE_RATE = 0.0   # ANNUAL rate — mu/sigma from finance_data.py are already
+                        # annualized (252-day convention), so this must be annual too,
+                        # not daily, or the Sharpe ratio will be silently wrong.
 N_SHOTS             = 1024
 REPS                = 1
 SEED                = 123

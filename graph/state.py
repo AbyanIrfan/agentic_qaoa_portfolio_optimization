@@ -82,6 +82,7 @@ class AgentState(TypedDict):
     approx_ratio:     Optional[float]
     cvar_value:       Optional[float]
     energy:           Optional[float]
+    sharpe_ratio:     Optional[float]
     metrics:          Optional[dict]         # Full metrics dict
 
     # ── Report node output ────────────────────────────────────────────────────

@@ -50,6 +50,7 @@ def run_single(llm_name: str = "hetero"):
     console.print(f"Approx ratio:    {_fmt('approx_ratio')}")
     console.print(f"CVaR (α=0.25):   {_fmt('cvar_value')}")
     console.print(f"Energy:          {_fmt('energy')}")
+    console.print(f"Sharpe ratio:    {_fmt('sharpe_ratio')}")
     console.print(f"Retries:         {final_state.get('retry_count', 0) - 1}")
 
     console.rule("[bold]Report")

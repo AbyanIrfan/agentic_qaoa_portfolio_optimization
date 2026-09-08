@@ -40,3 +40,6 @@ checkpoints/
 
 # macOS
 .DS_Store
+
+# commands
+tools/commands.txt

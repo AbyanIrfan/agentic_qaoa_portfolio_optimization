@@ -9,8 +9,9 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 from itertools import combinations as icombs
-
+import numpy as np
 from llm.router import get_node_llm, get_response_text
+
 
 RESULTS_DIR = Path("results")
 
@@ -79,6 +80,27 @@ def compute_cvar(quasi_dist, hamiltonian, alpha=0.25, offset=0.0):
             break
     return cvar_sum / alpha if alpha > 0 else 0.0
 
+def compute_sharpe_ratio(mu, sigma, selected_assets, budget, risk_free_rate=0.0):
+    """
+    Sharpe ratio of the EQUAL-WEIGHTED portfolio over the selected assets
+    (1/budget each). Equal-weighting is used because this pipeline only
+    performs discrete selection, not continuous allocation — there is no
+    optimized weight vector to draw on (unlike e.g. Mancilla et al.'s
+    separate SLSQP allocation stage).
+
+    mu/sigma are already annualized (see finance_data.py), so
+    risk_free_rate must also be annual for the units to match.
+    """
+    w = np.zeros(len(mu))
+    for i in selected_assets:
+        w[i] = 1.0 / budget
+    portfolio_return = float(w @ mu)
+    portfolio_variance = float(w @ sigma @ w)
+    portfolio_std = float(np.sqrt(max(portfolio_variance, 0.0)))
+    if portfolio_std < 1e-12:
+        return None  # degenerate — avoid dividing by ~zero
+    return (portfolio_return - risk_free_rate) / portfolio_std
+
 
 def _write_report(state, metrics, interpretation) -> Path:
     """Write a timestamped analysis report to results/. One file per run,
@@ -109,6 +131,7 @@ def _write_report(state, metrics, interpretation) -> Path:
 
 
 def analysis_node(state):
+    from config.settings import RISK_FREE_RATE
     llm = get_node_llm("analysis", state.get("llm_name"))                # analysis.py
 
     print("[Analysis] Computing metrics...")
@@ -118,6 +141,10 @@ def analysis_node(state):
     offset = state["offset"]
 
     approx_ratio = compute_approx_ratio(job_results, hamiltonian, offset, state["n_assets"], state["budget"])
+    sharpe_ratio = compute_sharpe_ratio(
+        state["mu"], state["sigma"], state["best_assets"], state["budget"],
+        risk_free_rate=RISK_FREE_RATE,
+    )
 
     # CVaR is an optimization-time training signal, computed fresh every
     # COBYLA iteration in execution.py — not something to independently
@@ -142,6 +169,7 @@ def analysis_node(state):
         "approx_ratio": approx_ratio,
         "cvar":         cvar_value,
         "energy":       energy,
+        "sharpe_ratio": sharpe_ratio,
         "variant":      state.get("variant_chosen"),
         "p_layers":     state.get("p_layers"),
         "backend":      state.get("backend_chosen"),
@@ -157,13 +185,15 @@ def analysis_node(state):
     In 2-3 sentences, explain:
     1. Whether the approximation ratio is acceptable
     2. What the CVaR value suggests about tail-risk performance
-    3. A specific recommendation for improvement if retry is needed
+    3. Whether the Sharpe ratio (equal-weighted, annualized) is reasonable for this asset universe
+    4. A specific recommendation for improvement if retry is needed
 
     Be concise and technical.
     """
     interpretation = get_response_text(llm.invoke(prompt))
 
-    print(f"[Analysis] AR={approx_ratio:.4f} | CVaR={cvar_value:.4f} | Energy={energy:.4f}")
+    sharpe_str = f"{sharpe_ratio:.4f}" if sharpe_ratio is not None else "N/A"
+    print(f"[Analysis] AR={approx_ratio:.4f} | CVaR={cvar_value:.4f} | Energy={energy:.4f} | Sharpe={sharpe_str}")
     print(f"[Analysis] Interpretation:\n{interpretation}")
 
     report_path = _write_report(state, metrics, interpretation)
@@ -175,6 +205,7 @@ def analysis_node(state):
         "approx_ratio": approx_ratio,
         "cvar_value":   cvar_value,
         "energy":       energy,
+        "sharpe_ratio": sharpe_ratio,
         "metrics":      {**metrics, "interpretation": interpretation},
         "retry_count":  state.get("retry_count", 0) + 1,
     }
