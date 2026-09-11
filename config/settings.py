@@ -37,7 +37,11 @@ IBM_QUANTUM_TOKEN    = os.getenv("IBM_QUANTUM_TOKEN")
 IBM_QUANTUM_CHANNEL  = os.getenv("IBM_QUANTUM_CHANNEL", "ibm_quantum")
 IBM_QUANTUM_INSTANCE = os.getenv("IBM_QUANTUM_INSTANCE", "ibm-q/open/main")
 DEFAULT_SIMULATOR    = os.getenv("DEFAULT_SIMULATOR", "aer_simulator")
-DEFAULT_HARDWARE     = os.getenv("DEFAULT_HARDWARE", "ibm_brisbane")
+DEFAULT_HARDWARE     = os.getenv("DEFAULT_HARDWARE", "ibm_kingston")
+USE_NOISY_SIM     = True
+NOISY_SIM_SOURCE  = "real"            # "fake" (fully local, no account needed) or "real" (fetches today's live
+                                        # calibration snapshot from IBM Cloud — metadata only, consumes no execution time)
+NOISY_SIM_BACKEND = "FakeSherbrooke"   # used when NOISY_SIM_SOURCE == "fake"
 
 # ── Benchmark ─────────────────────────────────────────────────────────────────
 RESULTS_DIR        = "results"

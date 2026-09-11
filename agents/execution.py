@@ -16,7 +16,7 @@ from qiskit_aer import AerSimulator
 from qiskit_aer.primitives import SamplerV2 as AerSamplerV2
 from scipy.optimize import minimize as scipy_minimize
 
-from config.settings import SEED, USE_HARDWARE
+from config.settings import SEED, USE_HARDWARE, USE_NOISY_SIM, NOISY_SIM_SOURCE, NOISY_SIM_BACKEND
 
 # ── Fast Pauli evaluation (IBM tutorial — bitwise XOR, orders of magnitude ────
 # ── faster than string-parsing over Pauli terms)  ────────────────────────────
@@ -166,14 +166,36 @@ def execution_node(state):
     print(f"[Execution] CVaR-COBYLA optimization")
     print(f"  α={ALPHA} | max_iter={MAX_ITER} | shots={N_SHOTS}")
 
-    if USE_HARDWARE:
+    if USE_HARDWARE or USE_NOISY_SIM:
         from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as RuntimeSampler
         service  = QiskitRuntimeService(
-            token   = os.environ.get("IBM_QUANTUM_TOKEN"),
-            channel = os.environ.get("IBM_QUANTUM_CHANNEL", "ibm_quantum"),
+            channel  = os.environ.get("IBM_QUANTUM_CHANNEL", "ibm_quantum_platform"),
+            token    = os.environ.get("IBM_QUANTUM_TOKEN"),
+            instance = os.environ.get("IBM_QUANTUM_CRN"),
         )
         backend      = service.backend(os.environ.get("DEFAULT_HARDWARE", "ibm_brisbane"))
         backend_used = backend.name
+
+    elif USE_NOISY_SIM:
+        from qiskit_ibm_runtime import SamplerV2 as RuntimeSampler
+
+        if NOISY_SIM_SOURCE == "real":
+            from qiskit_ibm_runtime import QiskitRuntimeService
+            service = QiskitRuntimeService(
+                channel  = os.environ.get("IBM_QUANTUM_CHANNEL", "ibm_quantum_platform"),
+                token    = os.environ.get("IBM_QUANTUM_TOKEN"),
+                instance = os.environ.get("IBM_QUANTUM_CRN"),
+            )
+            qpu_backend  = service.backend(os.environ.get("DEFAULT_HARDWARE", "ibm_brisbane"))
+            backend      = AerSimulator.from_backend(qpu_backend)
+            backend_used = f"AerSimulator.from_backend({qpu_backend.name}) [live calibration, no execution time used]"
+        else:
+            from qiskit_ibm_runtime import fake_provider
+            FakeBackendClass = getattr(fake_provider, NOISY_SIM_BACKEND)
+            qpu_backend  = FakeBackendClass()
+            backend      = AerSimulator.from_backend(qpu_backend)
+            backend_used = f"AerSimulator.from_backend({NOISY_SIM_BACKEND}) [local, historical snapshot]"
+
     else:
         backend      = AerSimulator()
         backend_used = "aer_simulator"
@@ -187,7 +209,7 @@ def execution_node(state):
           f"gates={transpiled.size()} | "
           f"params={transpiled.num_parameters}")
 
-    if USE_HARDWARE:
+    if USE_HARDWARE or USE_NOISY_SIM:
         sampler = RuntimeSampler(mode=backend)
     else:
         sampler = AerSamplerV2()
