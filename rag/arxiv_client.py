@@ -129,11 +129,7 @@ def _parse_entry(entry: ET.Element) -> ArxivPaper:
     published = text("published")[:10]
     updated = text("updated")[:10]
 
-    # journal_ref / doi live in the arxiv: namespace, same as primary_category —
-    # both are optional elements, only present once a paper has been formally
-    # published. Absence is NOT a reliable "unpublished" signal (many published
-    # papers never get this backfilled) — treat presence as a soft positive
-    # signal only, never absence as a negative one.
+    
     journal_ref_el = entry.find("arxiv:journal_ref", ATOM_NS)
     journal_ref = (journal_ref_el.text or "").strip() if journal_ref_el is not None else ""
     doi_el = entry.find("arxiv:doi", ATOM_NS)
@@ -209,7 +205,7 @@ def iterate_all(query: str, max_results_per_request: int = 100, max_total: int =
 
         start += len(papers)
         if len(papers) < page_size:
-            # Fewer results than requested — we've exhausted the query.
+            # Fewer results than requested, exhausted the query.
             break
 
 

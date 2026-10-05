@@ -169,7 +169,7 @@ def execution_node(state):
     if USE_HARDWARE or USE_NOISY_SIM:
         from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as RuntimeSampler
         service  = QiskitRuntimeService(
-            channel  = os.environ.get("IBM_QUANTUM_CHANNEL", "ibm_quantum_platform"),
+            channel  = os.environ.get("IBM_QUANTUM_CHANNEL", "ibm_cloud"),
             token    = os.environ.get("IBM_QUANTUM_TOKEN"),
             instance = os.environ.get("IBM_QUANTUM_CRN"),
         )
@@ -182,7 +182,7 @@ def execution_node(state):
         if NOISY_SIM_SOURCE == "real":
             from qiskit_ibm_runtime import QiskitRuntimeService
             service = QiskitRuntimeService(
-                channel  = os.environ.get("IBM_QUANTUM_CHANNEL", "ibm_quantum_platform"),
+                channel  = os.environ.get("IBM_QUANTUM_CHANNEL", "ibm_cloud"),
                 token    = os.environ.get("IBM_QUANTUM_TOKEN"),
                 instance = os.environ.get("IBM_QUANTUM_CRN"),
             )
@@ -239,13 +239,7 @@ def execution_node(state):
         options = {"maxiter": MAX_ITER, "rhobeg": 0.5},
     )
 
-    # COBYLA's last internal evaluate() call doesn't necessarily land at the
-    # params it ultimately reports as optimal (opt_result.x), so
-    # obj.final_distribution right after minimize() can reflect a different,
-    # sometimes worse, point. One extra evaluation at the confirmed-final
-    # params fixes this cheaply — it reuses the exact same sampling/tracking
-    # logic (updates final_distribution, best_bitstring/best_value, and the
-    # history lists), it just guarantees the LAST entry is genuinely final.
+    
     obj.evaluate(opt_result.x)
 
     job_results = {
@@ -268,7 +262,7 @@ def execution_node(state):
     best_assets = [i for i, b in enumerate(best_bits) if b == 1]
     print(f"  Best assets selected: {best_assets}")
 
-    print(f"\n✓ Node 3 complete.")
+    print(f"\nNode 3 complete.")
 
     return {
         "job_results":       job_results,

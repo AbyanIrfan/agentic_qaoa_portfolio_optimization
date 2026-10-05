@@ -66,7 +66,7 @@ def problem_init_node(state: dict) -> dict:
 
     print(f"Assets: {n_assets}, Budget: {BUDGET}, Risk factor: {RISK_FACTOR}")
     print(f"Covariance matrix shape: {sigma.shape}")
-    print("\n✓ State initialized.")
+    print("\nState initialized.")
     print("  Problem:", problem_input)
 
     return {

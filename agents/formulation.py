@@ -190,7 +190,7 @@ Assign results to exactly: hamiltonian, offset, warm_start_vec, truncated_pairs
             for i, val in enumerate(warm_start_vec):
                 print(f"    asset_{i}: {val:.4f}")
 
-            print(f"\n✓ Node 1 (v3) complete.")
+            print(f"\nNode 1 (v3) complete.")
 
             return {
                 "hamiltonian":               hamiltonian,
@@ -202,7 +202,7 @@ Assign results to exactly: hamiltonian, offset, warm_start_vec, truncated_pairs
 
         except Exception as e:
             last_error = traceback.format_exc()
-            print(f"  ✗ Attempt {attempt} failed: {str(e)}")
+            print(f"  Attempt {attempt} failed: {str(e)}")
             if attempt < MAX_RETRIES:
                 print(f"  Feeding error back to LLM...\n")
 

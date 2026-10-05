@@ -12,6 +12,7 @@ from llm.router import get_node_llm, get_response_text
 
 from rag.corpus_query import _embed_query
 from rag.store_utils import get_arxiv_runtime_cached
+from graph.execution_context import describe_execution_context
 
 
 def literature_validation_node(state):
@@ -63,6 +64,8 @@ def literature_validation_node(state):
     validation_prompt = f"""
     You are a quantum computing researcher fact-checking a methodology
     recommendation against primary-source full text.
+
+    {describe_execution_context()}
 
     Problem: {state['problem_input']}
 
@@ -129,11 +132,13 @@ def literature_validation_node(state):
     )
 
     if contradicted_flag:
-        print(f"\n  ⚠ At least one claim was contradicted by full-text evidence — "
+        print(f"\nAt least one claim was contradicted by full-text evidence — "
               f"review before proceeding to Node 1.")
 
         param_prompt = f"""
         Based on this full-text cross-check of a QAOA methodology recommendation:
+        
+        {describe_execution_context()}
 
         SUPPORTED: {sections['SUPPORTED']}
         CONTRADICTED: {sections['CONTRADICTED']}
@@ -187,7 +192,7 @@ def literature_validation_node(state):
         print(f"  truncation_fraction: {validated_truncation}  ({_flag(orig_truncation, validated_truncation)})")
         print(f"  penalty:             {validated_penalty}  ({_flag(orig_penalty, validated_penalty)})")
 
-    print(f"\n✓ Node 0.5 complete.")
+    print(f"\nNode 0.5 complete.")
 
     return {
         "literature_validation_skipped": False,

@@ -65,7 +65,7 @@ def _iter_classes_in_module(module_name: str):
 
     for name, obj in inspect.getmembers(module, inspect.isclass):
         if obj.__module__ != module_name:
-            continue  # imported from elsewhere; will be visited at its defining module
+            continue 
         if name.startswith("_"):
             continue
         yield f"{obj.__module__}.{obj.__qualname__}", obj
@@ -106,8 +106,6 @@ def _extract_one_class(qualified_name: str, cls: type) -> RawClassRecord:
     try:
         init_sig_str = str(inspect.signature(cls.__init__))
     except (ValueError, TypeError):
-        # Some classes (C extensions, dynamically generated __init__) have
-        # no introspectable signature. Recorded as unavailable, not fatal.
         pass
 
     source_available = True

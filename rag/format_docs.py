@@ -38,13 +38,7 @@ class FormattedClassDoc:
     description: str
     args: list[ArgDoc]
     introspectable: bool = True
-    # False when the real __init__ signature is opaque to `inspect` — most
-    # commonly Rust-accelerated bindings (e.g. qiskit._accelerate.circuit.
-    # ParameterVector) that report a generic "(self, /, *args, **kwargs)"
-    # regardless of their actual accepted arguments. In that case `args` is
-    # empty, but that emptiness means "unknown," not "takes no arguments" —
-    # callers (call_validator.py) must skip validation entirely rather than
-    # flag every real argument as unknown.
+
 
 
 _GENERIC_SIGNATURE_RE = re.compile(
@@ -128,16 +122,11 @@ def _args_from_signature_and_docstring(init_signature: str | None,
             for p in docstring_params.values()
         ]
 
-    # Re-parse the signature string back into a live Signature object isn't
-    # possible without the callable, so we parse it textually instead —
-    # good enough for name/annotation/default extraction, which is all we need.
+    # Re-parse the signature string back into a live Signature object isn't possible without the callable, so parse it textually instead —
+    
     args: list[ArgDoc] = []
     inner = init_signature.strip()
-    # Strip a trailing return-type annotation (e.g. "-> 'None'") BEFORE
-    # touching the outer parens — otherwise the leading "(" is never
-    # stripped (since the string then ends with the return type, not ")"),
-    # which makes bracket-depth tracking below never return to zero and
-    # silently swallows every comma split.
+    
     if " -> " in inner:
         inner = inner.rsplit(" -> ", 1)[0].strip()
     if inner.startswith("(") and inner.endswith(")"):

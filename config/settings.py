@@ -1,6 +1,5 @@
 """
 Global configuration for the Agentic QAOA pipeline.
-Edit values here — no need to touch agent code directly.
 """
 
 from dotenv import load_dotenv
@@ -10,27 +9,27 @@ load_dotenv()
 
 # ── LLM backends ──────────────────────────────────────────────────────────────
 LLM_BACKENDS = {
-    "claude":  "claude-sonnet-4-6",   # matches what's proven working from night one
-    "gpt":     "gpt-5.6-sol",         # current OpenAI flagship (gpt-4o is stale)
-    "gemini":  "gemini-3.1-pro-preview",  # current Gemini flagship (2.0-flash is shut down)
+    "claude":  "claude-sonnet-4-6",   
+    "gpt":     "gpt-5.6-sol",         
+    "gemini":  "gemini-3.1-pro-preview", 
 }
 
 NODE_LLM_MAP = {
-    "literature_search":     "gpt",     # tentative — see comparison report Section 8.1
-    "literature_validation": "claude",  # reverted to baseline
-    "formulation":           "gpt",     # held fixed, per the test design
-    "circuit_design":        "gpt",     # changed from "gemini" — the real variable, it turns out
+    "literature_search":     "gpt",      
+    "literature_validation": "claude",  
+    "formulation":           "gpt",     
+    "circuit_design":        "gpt",     
     "analysis":              "claude",
     "report":                "claude",
-    # "execution" removed — agents/execution.py makes no LLM call
+    
 }
 
 # ── QAOA hyperparameters ──────────────────────────────────────────────────────
 DEFAULT_P_LAYERS   = 1
 MAX_P_LAYERS       = 5
-RETRY_THRESHOLD    = 0.85          # Approx ratio below which we retry
+RETRY_THRESHOLD    = 0.85          
 MAX_RETRIES        = 3
-CVAR_ALPHA         = 0.25          # CVaR confidence level
+CVAR_ALPHA         = 0.25          
 
 # ── Hardware ──────────────────────────────────────────────────────────────────
 IBM_QUANTUM_TOKEN    = os.getenv("IBM_QUANTUM_TOKEN")
@@ -39,8 +38,7 @@ IBM_QUANTUM_INSTANCE = os.getenv("IBM_QUANTUM_INSTANCE", "ibm-q/open/main")
 DEFAULT_SIMULATOR    = os.getenv("DEFAULT_SIMULATOR", "aer_simulator")
 DEFAULT_HARDWARE     = os.getenv("DEFAULT_HARDWARE", "ibm_kingston")
 USE_NOISY_SIM     = True
-NOISY_SIM_SOURCE  = "real"            # "fake" (fully local, no account needed) or "real" (fetches today's live
-                                        # calibration snapshot from IBM Cloud — metadata only, consumes no execution time)
+NOISY_SIM_SOURCE  = "real"            
 NOISY_SIM_BACKEND = "FakeSherbrooke"   # used when NOISY_SIM_SOURCE == "fake"
 
 # ── Benchmark ─────────────────────────────────────────────────────────────────
@@ -48,9 +46,9 @@ RESULTS_DIR        = "results"
 BENCHMARK_SHOTS    = 1024
 USE_HARDWARE       = False         # Flip to True for real device runs
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Problem instance settings — edit these for your specific run
-# ═══════════════════════════════════════════════════════════════════════════
+
+# Problem instance settings 
+
 USE_LIVE_DATA      = False                                 # False reproduces the exact Woerner benchmark
 TICKERS     = ["LIN.DE", "BAYN.DE", "VNA.DE", "MTX.DE", "MUV2.DE",
                "SAP.DE", "SIE.DE", "ALV.DE", "DTE.DE", "BAS.DE"]  # only used if USE_LIVE_DATA=True
@@ -58,10 +56,9 @@ BUDGET              = 3                                     # number of assets t
 RISK_FACTOR         = 0.5                                    # risk-aversion weight, conventionally in [0, 1]
 LOOKBACK_DAYS       = 252                                     # ~1 trading year; see finance_data.py docstring
 RETURN_CONVENTION   = "log"                                    # "log" or "simple"
-END_DATE            = "2026-09-02"                               # pinned for the multi-run stability study — see
-                                                                  # comparison report Section 6.2/10; None = most recent                                     # e.g. "2026-02-16" to reproduce a historical window
+END_DATE            = "2026-09-02"                               
 PENALTY             = 12                                  # QUBO constraint-penalty starting weight (Node 0 may revise)
-RISK_FREE_RATE = 0.0   # ANNUAL rate — mu/sigma from finance_data.py are already
+RISK_FREE_RATE = 0.0   # ANNUAL rate, mu/sigma from finance_data.py are already
                         # annualized (252-day convention), so this must be annual too,
                         # not daily, or the Sharpe ratio will be silently wrong.
 N_SHOTS             = 1024

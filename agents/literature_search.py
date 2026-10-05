@@ -238,7 +238,7 @@ def literature_search_node(state):
         t_frac  = 0.5
         penalty = 12
 
-    print(f"\n✓ Node 0 complete — {len(unique)} papers retrieved.")
+    print(f"\nNode 0 complete — {len(unique)} papers retrieved.")
 
     return {
         "literature_recommendation": recommendation,

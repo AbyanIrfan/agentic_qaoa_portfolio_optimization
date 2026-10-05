@@ -61,10 +61,9 @@ class ProblemData:
     risk_factor: float | None = None
 
 
-# ------------------------------------------------------------------ #
+
 # Step 1: fetch — pure I/O, no computation, ALWAYS raises on failure.
-# No fallback logic here, by design — see module docstring.
-# ------------------------------------------------------------------ #
+
 
 def fetch_price_history(
     tickers: list[str],
@@ -112,9 +111,7 @@ def fetch_price_history(
             f"are correct and currently listed."
         )
 
-    # yfinance returns a single-level frame for one ticker, a DataFrame
-    # with a MultiIndex column (field, ticker) for multiple — normalize
-    # to a single-level DataFrame with one column per ticker either way.
+    
     if len(tickers) == 1:
         prices = raw[["Close"]].copy()
         prices.columns = tickers
@@ -122,7 +119,7 @@ def fetch_price_history(
         prices = raw["Close"].copy()
 
     # A ticker that doesn't exist / is delisted often comes back as an
-    # all-NaN column rather than raising — catch that explicitly and name
+    # all-NaN column rather than raising, catch that explicitly and name
     # the offending ticker(s), rather than letting NaNs silently propagate
     # into mu/sigma downstream.
     all_nan_tickers = [t for t in prices.columns if prices[t].isna().all()]
@@ -172,9 +169,9 @@ def _synthetic_price_history(tickers: list[str], lookback_days: int, seed: int) 
     return prices
 
 
-# ------------------------------------------------------------------ #
+
 # Step 2: compute — pure math, fully testable without any network
-# ------------------------------------------------------------------ #
+
 
 def compute_mu_sigma(
     prices: pd.DataFrame,
@@ -204,10 +201,10 @@ def compute_mu_sigma(
     return mu, sigma
 
 
-# ------------------------------------------------------------------ #
+
 # Step 3: convenience wrapper — the function Node 0/problem-init calls.
-# This is the ONE place the synthetic-fallback decision is made.
-# ------------------------------------------------------------------ #
+
+
 
 def get_problem_data(
     tickers: list[str],

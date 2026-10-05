@@ -199,7 +199,7 @@ def analysis_node(state):
     report_path = _write_report(state, metrics, interpretation)
     print(f"[Analysis] Report written to {report_path}")
 
-    print("\n✓ Node 4 complete.")
+    print("\nNode 4 complete.")
 
     return {
         "approx_ratio": approx_ratio,

@@ -177,6 +177,6 @@ def report_node(state):
     report_path = _write_report(report, backend=state.get("llm_name", "unknown"))
     print(f"[Report] Report written to {report_path}")
 
-    print("\n✓ Full pipeline complete — all 5 nodes executed successfully.")
+    print("\nFull pipeline complete — all 5 nodes executed successfully.")
 
     return {"report": report}

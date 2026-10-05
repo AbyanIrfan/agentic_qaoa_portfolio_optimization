@@ -61,11 +61,6 @@ class QiskitDocStore:
         best_problems = None
         for doc in matches:
             if not doc.get("introspectable", True):
-                # Known class, but its real __init__ signature is opaque to
-                # static inspection (most commonly a Rust-accelerated
-                # binding). Silently allowing is the honest choice here —
-                # flagging every argument as "unknown" would be worse than
-                # not checking at all, since we have zero real information.
                 return []
 
             args = doc["args"]
@@ -95,10 +90,6 @@ class QiskitDocStore:
             satisfied = set(keyword_names)
 
             if var_positional_present:
-                # A leading *args-style parameter (e.g. QuantumCircuit's
-                # *regs) absorbs unlimited positional arguments — there is
-                # nothing meaningful to bind them to by name, and no
-                # "too many positional args" ceiling to check.
                 pass
             else:
                 bound = positional_names[:n_positional]

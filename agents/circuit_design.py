@@ -19,6 +19,8 @@ from rag.call_validator import validate_generated_code
 from rag.corpus_query import query_corpus_for_implementation_detail
 from rag.store_utils import get_arxiv_runtime_cached, get_qiskit_doc_store
 
+from graph.execution_context import describe_execution_context
+
 
 def circuit_design_node(state):
     llm = get_node_llm("circuit_design", state.get("llm_name"))          # circuit_design.py
@@ -43,6 +45,8 @@ def circuit_design_node(state):
     variant_prompt = f"""
     You are a quantum circuit design expert specializing in QAOA.
     Given the following context, select the most appropriate QAOA variant.
+
+    {describe_execution_context()}
 
     Problem: {state['problem_input']}
     Warm-start vector available: True
@@ -195,7 +199,7 @@ Assign result to exactly: circuit
                 if attempt < MAX_RETRIES:
                     print(f"  Feeding error back to LLM...\n")
                 continue
-            print(f"  ✓ Static validation passed ({len(static_problems)} issues found)")
+            print(f"  Static validation passed ({len(static_problems)} issues found)")
         else:
             print(f"  (Skipping static doc-store validation — store not loaded)")
 
@@ -266,14 +270,13 @@ Assign result to exactly: circuit
             print(f"\n  Circuit diagram:")
             print(circuit.draw("text"))
 
-            print(f"\n✓ Node 2 (v3 + static validation) complete.")
+            print(f"\nNode 2 (v3 + static validation) complete.")
 
             return {
                 "circuit":                  circuit,
                 "variant_chosen":           variant,
                 "variant_reasoning":        reasoning,
                 "p_layers":                 p_layers,
-                "retry_count":              0,
                 "generated_circuit_code":   generated_code,
                 "hw_preservation_fraction": hw_fraction,
                 "static_validation_passed": qiskit_doc_store is not None,

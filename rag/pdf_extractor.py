@@ -16,11 +16,7 @@ from pathlib import Path
 import tiktoken
 from pypdf import PdfReader
 
-# cl100k_base is the tokenizer used by text-embedding-3-small/large.
-# Loaded lazily (and cached) since tiktoken fetches its BPE file over the
-# network on first use — on an offline or firewalled machine this falls
-# back to a word-count approximation (~0.75 tokens/word) rather than
-# crashing at import time.
+
 _encoding_cache: dict = {"enc": None, "checked": False}
 
 WORDS_PER_TOKEN_APPROX = 0.75  # ~1.33 tokens/word, standard English approximation

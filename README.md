@@ -89,7 +89,7 @@ uv pip install -r requirements.txt
 uv pip install -e .
 ```
 
-**API keys** — copy `.env.example` to `.env` and fill in:
+**API keys** :
 
 ```
 ANTHROPIC_API_KEY=...
@@ -137,11 +137,6 @@ Results are written to `results/analysis_<backend>_<timestamp>.txt` and `results
 - **Problem instance** — `TICKERS`, `BUDGET`, `RISK_FACTOR`, `LOOKBACK_DAYS`, `END_DATE` (pin this for reproducible, repeatable runs — live data otherwise refetches on every run), `USE_LIVE_DATA` (set `False` to reproduce the fixed Woerner benchmark instance instead).
 - **Hardware** — `USE_HARDWARE`, IBM Quantum credentials, for running on real devices instead of the Aer simulator.
 
-## Known Limitations
-
-- Comparative claims about which LLM backend suits which node are based on a small number of repeated runs on a single problem instance — informative, not statistically conclusive.
-- `literature_validation`'s retrieval query is built from `literature_search`'s free-text output, so retrieval can be sensitive to the exact phrasing of the upstream recommendation.
-- Node-to-node behavior may depend on which backend authored the *upstream* content a node reads, not only which backend executes the node itself — under active investigation.
 
 ## License
 

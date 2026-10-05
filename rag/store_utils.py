@@ -68,7 +68,7 @@ def get_arxiv_runtime_cached():
     on every node call within a single graph run."""
     return get_arxiv_runtime()
 
-# rag/store_utils.py — add this alongside the arXiv loaders
+# rag/store_utils.py 
 from rag.doc_lookup import QiskitDocStore
 
 DEFAULT_QISKIT_DOC_STORE_PATH = "data/references/qiskit_formatted.json"

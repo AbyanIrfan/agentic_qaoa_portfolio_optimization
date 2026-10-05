@@ -39,7 +39,7 @@ class ChunkRecord:
     doi: str = ""
     # Both new fields default to "" so records already stored on disk from
     # before this change (missing these keys entirely in their JSON) still
-    # construct cleanly via ChunkRecord(**r) — they just get no boost until
+    # construct cleanly via ChunkRecord(**r), they just get no boost until
     # their paper is re-ingested, never a crash on load.
 
 
@@ -57,9 +57,7 @@ class ArxivVectorStore:
         self.metadata: list[ChunkRecord] = []
         self.manifest: set[str] = set()
 
-    # ------------------------------------------------------------------ #
-    # Construction / loading
-    # ------------------------------------------------------------------ #
+
 
     def init_new(self) -> None:
         """Start a fresh index, discarding any existing files on disk for this name."""
@@ -91,17 +89,17 @@ class ArxivVectorStore:
         self.init_new()
         return False
 
-    # ------------------------------------------------------------------ #
+    
     # Manifest checks — used to skip already-ingested papers BEFORE any
     # download/extract/embed work happens.
-    # ------------------------------------------------------------------ #
+    
 
     def already_ingested(self, arxiv_id: str) -> bool:
         return arxiv_id in self.manifest
 
-    # ------------------------------------------------------------------ #
+    
     # Adding data
-    # ------------------------------------------------------------------ #
+    
 
     def add_paper_chunks(self, records: list[ChunkRecord], embeddings: np.ndarray) -> None:
         """
@@ -124,9 +122,9 @@ class ArxivVectorStore:
         # All records in one call share an arxiv_id by construction.
         self.manifest.add(records[0].arxiv_id)
 
-    # ------------------------------------------------------------------ #
+    
     # Persistence
-    # ------------------------------------------------------------------ #
+    
 
     def save(self) -> None:
         if self.index is None:
@@ -138,10 +136,10 @@ class ArxivVectorStore:
         with open(self.manifest_path, "w", encoding="utf-8") as f:
             json.dump(sorted(self.manifest), f)
 
-    # ------------------------------------------------------------------ #
-    # Query (used later by the Discussion/critique node — included here
+    
+    # Query (used later by the Discussion/critique node, included here
     # so the store is immediately usable, not just buildable)
-    # ------------------------------------------------------------------ #
+    
 
     def search(self, query_embedding: np.ndarray, top_k: int = 3,
                journal_boost: float = 1.0, over_fetch_multiplier: int = 3

@@ -20,8 +20,7 @@ python scripts\backfill_journal_refs.py `
 
   # Optional: regenerates the Qiskit doc reference store from the installed
 # qiskit/qiskit-optimization/qiskit-algorithms/qiskit-finance packages.
-# Skip this if data/references/qiskit_raw.json and qiskit_formatted.json
-# are already present (e.g. pulled from an existing corpus).
+# Skip this if data/references/qiskit_raw.json and qiskit_formatted.json are already present (e.g. pulled from an existing corpus).
 python scripts\setup_qiskit_db.py `
   --save_raw_json_path="data/references/qiskit_raw.json" `
   --save_formatted_json_path="data/references/qiskit_formatted.json"
