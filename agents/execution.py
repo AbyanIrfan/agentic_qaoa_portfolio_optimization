@@ -166,7 +166,7 @@ def execution_node(state):
     print(f"[Execution] CVaR-COBYLA optimization")
     print(f"  α={ALPHA} | max_iter={MAX_ITER} | shots={N_SHOTS}")
 
-    if USE_HARDWARE or USE_NOISY_SIM:
+    if USE_HARDWARE:
         from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as RuntimeSampler
         service  = QiskitRuntimeService(
             channel  = os.environ.get("IBM_QUANTUM_CHANNEL", "ibm_cloud"),

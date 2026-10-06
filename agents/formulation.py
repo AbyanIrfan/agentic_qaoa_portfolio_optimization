@@ -56,7 +56,7 @@ Use them exactly as named — do NOT redefine them:
   n_assets            : int = {state['n_assets']}
   budget              : int = {state['budget']}
   risk_factor         : float = {state['risk_factor']}
-  penalty             : int = {state['penalty']}
+  penalty             : int = {state.get('validated_penalty', state['penalty'])}
   truncation_fraction : float = {state.get('validated_truncation_fraction', state.get('truncation_fraction', 0.5))}
 
 The following are already imported — do NOT add import statements:
@@ -111,7 +111,7 @@ Assign results to exactly: hamiltonian, offset, warm_start_vec, truncated_pairs
             "n_assets":              state["n_assets"],
             "budget":                state["budget"],
             "risk_factor":           state["risk_factor"],
-            "penalty":               state["penalty"],
+            "penalty":               state.get('validated_penalty', state['penalty']),
             "truncation_fraction":   state.get("validated_truncation_fraction", state.get("truncation_fraction", 0.5)),
         }
 
